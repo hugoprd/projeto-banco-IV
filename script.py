@@ -1,10 +1,31 @@
-import loginbanco;
+import datetime;
 import usuario;
 import clientebanco;
 
 lista_usuarios = [];
 lista_contas = [];
 agencia = "0001";
+
+# ============================================== LOGS ==============================================
+#def log_transacao(func):
+#    def envelope(*args, **kwargs):
+#        resultado = func(*args, **kwargs);
+#        print(f"{datetime.now()}: {func.__name__.upper()}");
+#        return resultado;
+#
+# ============================================== MENU GERAL ==============================================
+#def menu_geral():
+#    print("\n ===== Seja bem-vindo(a) ao banco =====");
+#    print("\n ===== Selecione a acao desejada:");
+#    print("\n [nc]\tNova Conta");
+#    print("\n [nu]\tNovo Usuario");
+#    print("\n [l]\tLogar");
+#    print("\n [q]\tSair");
+#
+# ============================================== MENU CONTA ==============================================
+def menu_conta():
+    print("\n[1]\tNova Conta");
+    print("\n[2]\tEntrar Conta");
 
 # ============================================== CADASTRO USUARIO ==============================================
 #ver se a string nao possui apenas o mesmo numero
@@ -112,9 +133,9 @@ def validarDataNascimento(rData):
         print("Data invalida. Tente novamente.");
 
 def cadastroUsuario():
-    print("===================================================");
-    print("================ Seja bem-vindo(a) ================");
-    print("Digite suas informacoes a seguir para se cadastrar:");
+    print(" ===================================================");
+    print(" ================ Seja bem-vindo(a) ================");
+    print(" Digite suas informacoes a seguir para se cadastrar:");
 
     while True:
         while True:
@@ -165,12 +186,19 @@ def cadastroUsuario():
         enderecoFinal = logradouro.format(respostaRua, respostaNumero, respostaSigla);
         
         usuario = usuario.Usuario(cpfFinal, nomeFinal, nascimentoFinal, enderecoFinal);
+        lista_usuarios.append(usuario);
 
-        print("Usuario cadastrado com sucesso.");
-        print(f"\nCPF: {usuario.cpf}");
-        print(f"\nNome: {usuario.nome}");
-        print(f"\nData de nascimento: {usuario.data_nascimento}");
-        print(f"\nEndereco: {usuario.endereco}");
+        break;
+
+    print("Usuario cadastrado com sucesso.");
+    print(f"\nCPF: {usuario.cpf}");
+    print(f"\nNome: {usuario.nome}");
+    print(f"\nData de nascimento: {usuario.data_nascimento}");
+    print(f"\nEndereco: {usuario.endereco}");
+
+    print("\n ===================================================");
+    print("\n [nc]\tNova Conta");
+    print("\n")
 
 # ============================================== CADASTRAR CONTA BANCO ==============================================
 #verificar se o cpf digitado é válido e se já está cadastrado
@@ -190,9 +218,9 @@ def validarCadastro(cpf):
 
 
 def cadastroBanco(usuarioX):
-    print("============================================================");
-    print("===================== Seja bem-vindo(a) ====================");
-    print("Digite suas informacoes a seguir para se cadastrar no banco:");
+    print("\n ============================================================");
+    print("\n ===================== Seja bem-vindo(a) ====================");
+    print("\n Digite suas informacoes a seguir para se cadastrar no banco:");
 
     while True:
         resposta_cadastro = input("\nDigite o seu CPF: ");
@@ -206,28 +234,97 @@ def cadastroBanco(usuarioX):
             break;
 
     banco = banco.Banco(usuarioX.cpf, usuarioX.nome, usuarioX.data_nascimento, usuarioX.endereco, num);
+    lista_contas.append(banco);
 
     print("\nCadastro concluido.");
     print(f"\nConta {banco.num} do CPF {banco.cpf}");
     print(f"\nAgencia: {agencia}. Numero da conta: {banco.num}. Usuario: {banco.cpf}");
 
 # ============================================== ENTRAR NO USUARIO E NA CONTA ==============================================
-def entrarUsuario():
+def entrarConta(conta):
+    print(f"\n ===== INFORMACOES DA CONTA {conta.numero_conta} de {conta.nome} =====");
+    print(f"\nCPF: {conta.cpf}");
+    print(f"\nSaldo: {conta.saldo}");
+
+    print("\n ===== O que deseja fazer? ");
+    print("\n[1]\tDepositar");
+    print("\n[2]\tSacar");
+    print("\n[3]\tExtrato");
+    print("\n[q]\tSair");
+
+    while True:
+        resposta = input("\n=> ");
+        if resposta == 1:
+            conta.depositar(conta.saldo);
+        elif resposta == 2:
+            conta.sacar(conta.saldo);
+        elif resposta == 3:
+            conta.exibir_extrato(conta.extrato);
+        elif resposta == "q" or resposta == "Q":
+            break;
+        else:
+            print("\nResposta invalida. Tente novamente.");
+
+def logar_usuario():
     while True:
         resposta_entrar = input("\nDigite o seu CPF: ");
         respostaFinal = validarCpf(resposta_entrar);
 
         if respostaFinal == resposta_entrar:
-            for conta in lista_contas:
-                if conta.cpf == respostaFinal:
-                    nomeAux = conta.nome;
-                    break;
+            for usuario in lista_usuarios:
+                if usuario.cpf == respostaFinal:
+                    if usuario.tem_conta == True:
+                        nomeAux = conta.nome;
+                        cpfAux = conta.cpf;
+                        break;
+                    elif usuario.tem_conta == False:
+
 
             print(f"Seja bem-vindo(a) {nomeAux}");
+            print("Suas contas:");
 
+            aux = 0;
             for conta in lista_contas:
-                if conta.numero_conta
+                if conta.cpf == cpfAux:
+                    print(f"\nConta {conta.numero_conta}: saldo = {conta.saldo}");
+                    aux += 1;
 
+            resposta = input("\nQual conta deseja entrar?\n=> ");
+            for i in aux:
+                if resposta == i:
+                    conta_escolhida = 0;
+                    for conta in lista_contas:
+                        if conta.numero_conta == i:
+                            conta_escolhida = conta;
+                    
+                    print(f"\nConta selecionada: {conta_escolhida.numero_conta}");
+                    entrarConta(conta_escolhida);
+                    break;
+            
+            break;
+
+# ============================================== MAIN ==============================================
 def main():
+    print("\n ======================================");
+    print("\n ===== Seja bem-vindo(a) ao banco =====");
+    print("\n ===== Selecione a acao desejada:");
+    print("\n [nu]\tNovo Usuario");
+    print("\n [l]\tLogar");
+    print("\n [q]\tSair");
+    
+    while True:
+        resposta_geral = input("\n=> ");
+
+        if resposta_geral == "nu" or resposta_geral == "Nu" or resposta_geral == "NU" or resposta_geral == "nU":
+            cadastroUsuario();
+            
+            break;
+        elif resposta_geral == "l" or resposta_geral == "L":
+            logar_usuario();
+
+            break;
+        else:
+            print("\nResposta invalida. Tente novamente.");
+
 
 main();
